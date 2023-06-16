@@ -31,4 +31,5 @@ aula-*/*_override.tf.json
 
 # Ignore CLI configuration files
 aula-*/.terraformrc
-aula-*/terraform.rc
+aula-*/.terraform.rc
+aula-*/.terraform.lock.hcl
