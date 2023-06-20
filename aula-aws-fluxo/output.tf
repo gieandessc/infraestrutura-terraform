@@ -1,0 +1,1 @@
+output "lb_url" { value = "http://${resource.aws_lb.nlb_lb_tf.dns_name}" }
