@@ -3,7 +3,7 @@ resource "aws_ecs_service" "ecs_service_tf" {
   cluster         = module.ecs.cluster_id
   launch_type     = "FARGATE"
   task_definition = aws_ecs_task_definition.task_definition_tf.arn
-  desired_count   = 3
+  desired_count   = 2
 
   load_balancer {
     container_name   = local.container_name

@@ -24,7 +24,6 @@ module "ecr" {
 # * our Image to our Repository in AWS. Also, give it a random image tag.
 resource "docker_image" "this" {
   name = format("%v:%v", module.ecr.repository_url, formatdate("YYYY-MM-DD'T'hh-mm-ss", timestamp()))
-
   build { context = "./app" } # Path to our local Dockerfile
 }
 

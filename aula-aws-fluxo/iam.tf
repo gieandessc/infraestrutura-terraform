@@ -1,49 +1,173 @@
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "role-name"
+resource "aws_iam_role" "ecs_tasks_execution_role" {
+  name = "ecs-task-execution-role"
 
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "ecs-tasks.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : "sts:AssumeRole",
+        "Principal" : {
+          "Service" : "ecs-tasks.amazonaws.com"
+        },
+        "Effect" : "Allow",
+        "Sid" : ""
+      }
+    ]
+  })
 }
 
-resource "aws_iam_role" "ecs_task_role" {
-  name = "role-name-task"
+resource "aws_iam_role" "ecs_tasks_role" {
+  name = "ecs-task-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
 
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "ecs-tasks.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
-}
 
 resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attachment" {
-  role       = aws_iam_role.ecs_task_execution_role.name
+  role       = aws_iam_role.ecs_tasks_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_role_policy_attachment" "task_s3" {
-  role       = aws_iam_role.ecs_task_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+resource "aws_iam_role_policy" "ecs_tasks_role_policy" {
+  name = "ecs_tasks_role_policy"
+  role = aws_iam_role.ecs_tasks_role.id
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "application-autoscaling:DeleteScalingPolicy",
+          "application-autoscaling:DeregisterScalableTarget",
+          "application-autoscaling:DescribeScalableTargets",
+          "application-autoscaling:DescribeScalingActivities",
+          "application-autoscaling:DescribeScalingPolicies",
+          "application-autoscaling:PutScalingPolicy",
+          "application-autoscaling:RegisterScalableTarget",
+          "appmesh:DescribeVirtualGateway",
+          "appmesh:DescribeVirtualNode",
+          "appmesh:ListMeshes",
+          "appmesh:ListVirtualGateways",
+          "appmesh:ListVirtualNodes",
+          "autoscaling:CreateAutoScalingGroup",
+          "autoscaling:CreateLaunchConfiguration",
+          "autoscaling:DeleteAutoScalingGroup",
+          "autoscaling:DeleteLaunchConfiguration",
+          "autoscaling:Describe*",
+          "autoscaling:UpdateAutoScalingGroup",
+          "cloudformation:CreateStack",
+          "cloudformation:DeleteStack",
+          "cloudformation:DescribeStack*",
+          "cloudformation:UpdateStack",
+          "cloudwatch:DeleteAlarms",
+          "cloudwatch:DescribeAlarms",
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:PutMetricAlarm",
+          "codedeploy:BatchGetApplicationRevisions",
+          "codedeploy:BatchGetApplications",
+          "codedeploy:BatchGetDeploymentGroups",
+          "codedeploy:BatchGetDeployments",
+          "codedeploy:ContinueDeployment",
+          "codedeploy:CreateApplication",
+          "codedeploy:CreateDeployment",
+          "codedeploy:CreateDeploymentGroup",
+          "codedeploy:GetApplication",
+          "codedeploy:GetApplicationRevision",
+          "codedeploy:GetDeployment",
+          "codedeploy:GetDeploymentConfig",
+          "codedeploy:GetDeploymentGroup",
+          "codedeploy:GetDeploymentTarget",
+          "codedeploy:ListApplicationRevisions",
+          "codedeploy:ListApplications",
+          "codedeploy:ListDeploymentConfigs",
+          "codedeploy:ListDeploymentGroups",
+          "codedeploy:ListDeployments",
+          "codedeploy:ListDeploymentTargets",
+          "codedeploy:RegisterApplicationRevision",
+          "codedeploy:StopDeployment",
+          "ec2:AssociateRouteTable",
+          "ec2:AttachInternetGateway",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:CancelSpotFleetRequests",
+          "ec2:CreateInternetGateway",
+          "ec2:CreateLaunchTemplate",
+          "ec2:CreateRoute",
+          "ec2:CreateRouteTable",
+          "ec2:CreateSecurityGroup",
+          "ec2:CreateSubnet",
+          "ec2:CreateVpc",
+          "ec2:DeleteLaunchTemplate",
+          "ec2:DeleteSubnet",
+          "ec2:DeleteVpc",
+          "ec2:Describe*",
+          "ec2:DetachInternetGateway",
+          "ec2:DisassociateRouteTable",
+          "ec2:ModifySubnetAttribute",
+          "ec2:ModifyVpcAttribute",
+          "ec2:RequestSpotFleet",
+          "ec2:RunInstances",
+          "ecs:*",
+          "elasticfilesystem:DescribeAccessPoints",
+          "elasticfilesystem:DescribeFileSystems",
+          "elasticloadbalancing:CreateListener",
+          "elasticloadbalancing:CreateLoadBalancer",
+          "elasticloadbalancing:CreateRule",
+          "elasticloadbalancing:CreateTargetGroup",
+          "elasticloadbalancing:DeleteListener",
+          "elasticloadbalancing:DeleteLoadBalancer",
+          "elasticloadbalancing:DeleteRule",
+          "elasticloadbalancing:DeleteTargetGroup",
+          "elasticloadbalancing:DescribeListeners",
+          "elasticloadbalancing:DescribeLoadBalancers",
+          "elasticloadbalancing:DescribeRules",
+          "elasticloadbalancing:DescribeTargetGroups",
+          "events:DeleteRule",
+          "events:DescribeRule",
+          "events:ListRuleNamesByTarget",
+          "events:ListTargetsByRule",
+          "events:PutRule",
+          "events:PutTargets",
+          "events:RemoveTargets",
+          "fsx:DescribeFileSystems",
+          "iam:ListAttachedRolePolicies",
+          "iam:ListInstanceProfiles",
+          "iam:ListRoles",
+          "lambda:ListFunctions",
+          "logs:CreateLogGroup",
+          "logs:DescribeLogGroups",
+          "logs:FilterLogEvents",
+          "route53:CreateHostedZone",
+          "route53:DeleteHostedZone",
+          "route53:GetHealthCheck",
+          "route53:GetHostedZone",
+          "route53:ListHostedZonesByName",
+          "servicediscovery:CreatePrivateDnsNamespace",
+          "servicediscovery:CreateService",
+          "servicediscovery:DeleteService",
+          "servicediscovery:GetNamespace",
+          "servicediscovery:GetOperation",
+          "servicediscovery:GetService",
+          "servicediscovery:ListNamespaces",
+          "servicediscovery:ListServices",
+          "servicediscovery:UpdateService",
+          "sns:ListTopics"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
 }

@@ -6,7 +6,7 @@ WORKDIR /app
 ENV \
     MY_INPUT_ENV_VAR=dockerfile-default-env-var \
     NODE_ENV=production \
-    PORT=8080
+    PORT=8081
 
 EXPOSE ${PORT}
 
