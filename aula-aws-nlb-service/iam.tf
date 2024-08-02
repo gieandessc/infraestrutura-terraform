@@ -1,6 +1,5 @@
 resource "aws_iam_role" "ecs_tasks_execution_role" {
   name = "ecs-task-execution-role"
-
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -16,40 +15,40 @@ resource "aws_iam_role" "ecs_tasks_execution_role" {
   })
 }
 
-resource "aws_iam_role" "ecs_tasks_role" {
-  name = "ecs-task-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
-    ]
-  })
-}
-
-
 resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attachment" {
   role       = aws_iam_role.ecs_tasks_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_role" "ecs_tasks_role" {
+  name = "ecs-task-role"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : "sts:AssumeRole",
+        "Effect" : "Allow",
+        "Sid" : "",
+        "Principal" : {
+          "Service" : "ecs-tasks.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy" "ecs_tasks_role_policy" {
   name = "ecs_tasks_role_policy"
   role = aws_iam_role.ecs_tasks_role.id
-
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
-        Action = [
+        "Action" : [
+          "ecs:*",
+          "ec2:Describe*",
+          "elasticloadbalancing:Describe*",
+          "cloudwatch:PutMetricAlarm",
           "application-autoscaling:DeleteScalingPolicy",
           "application-autoscaling:DeregisterScalableTarget",
           "application-autoscaling:DescribeScalableTargets",
@@ -75,7 +74,6 @@ resource "aws_iam_role_policy" "ecs_tasks_role_policy" {
           "cloudwatch:DeleteAlarms",
           "cloudwatch:DescribeAlarms",
           "cloudwatch:GetMetricStatistics",
-          "cloudwatch:PutMetricAlarm",
           "codedeploy:BatchGetApplicationRevisions",
           "codedeploy:BatchGetApplications",
           "codedeploy:BatchGetDeploymentGroups",
@@ -112,14 +110,12 @@ resource "aws_iam_role_policy" "ecs_tasks_role_policy" {
           "ec2:DeleteLaunchTemplate",
           "ec2:DeleteSubnet",
           "ec2:DeleteVpc",
-          "ec2:Describe*",
           "ec2:DetachInternetGateway",
           "ec2:DisassociateRouteTable",
           "ec2:ModifySubnetAttribute",
           "ec2:ModifyVpcAttribute",
           "ec2:RequestSpotFleet",
           "ec2:RunInstances",
-          "ecs:*",
           "elasticfilesystem:DescribeAccessPoints",
           "elasticfilesystem:DescribeFileSystems",
           "elasticloadbalancing:CreateListener",
@@ -130,10 +126,6 @@ resource "aws_iam_role_policy" "ecs_tasks_role_policy" {
           "elasticloadbalancing:DeleteLoadBalancer",
           "elasticloadbalancing:DeleteRule",
           "elasticloadbalancing:DeleteTargetGroup",
-          "elasticloadbalancing:DescribeListeners",
-          "elasticloadbalancing:DescribeLoadBalancers",
-          "elasticloadbalancing:DescribeRules",
-          "elasticloadbalancing:DescribeTargetGroups",
           "events:DeleteRule",
           "events:DescribeRule",
           "events:ListRuleNamesByTarget",
@@ -146,9 +138,11 @@ resource "aws_iam_role_policy" "ecs_tasks_role_policy" {
           "iam:ListInstanceProfiles",
           "iam:ListRoles",
           "lambda:ListFunctions",
-          "logs:CreateLogGroup",
           "logs:DescribeLogGroups",
           "logs:FilterLogEvents",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
           "route53:CreateHostedZone",
           "route53:DeleteHostedZone",
           "route53:GetHealthCheck",
@@ -164,10 +158,10 @@ resource "aws_iam_role_policy" "ecs_tasks_role_policy" {
           "servicediscovery:ListServices",
           "servicediscovery:UpdateService",
           "sns:ListTopics"
-        ]
-        Effect   = "Allow"
-        Resource = "*"
-      },
+        ],
+        "Effect" : "Allow",
+        "Resource" : "*"
+      }
     ]
   })
 }
