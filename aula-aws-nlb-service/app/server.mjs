@@ -1,4 +1,5 @@
 // server.mjs
+import { randomUUID } from 'crypto';
 import { createServer } from 'http';
 import { parse } from 'url';
 
@@ -6,18 +7,28 @@ import { parse } from 'url';
 const server = createServer((req, res) => {
   // Parse the request url
   const reqUrl = parse(req.url).pathname;
-
+  const aulas = [
+    {
+      id: randomUUID(),
+      title: "Aula 1",
+      description: "Estudando AWS + Terraform na marra com ajuda do StackSpotAi"
+    },
+    {
+      id: randomUUID(),
+      title: "Aula 2",
+      description: "Estudando AWS + Terraform na marra com ajuda do StackSpotAi"
+    },
+    {
+      id: randomUUID(),
+      title: "Aula 3",
+      description: "Estudando AWS + Terraform na marra com ajuda do StackSpotAi"
+    }
+  ]
   // Compare our request method
   if (req.method === "GET") {
-    if (reqUrl === "/") {
+    if (reqUrl === "/aulas") {
       res.setHeader('Content-Type', 'application/json');
-      res.write(JSON.stringify({ message: "you're boring" }));
-      res.end();
-    }
-  } else if (req.method === "POST") {
-    if (reqUrl === "/hello") {
-      res.setHeader('Content-Type', 'application/json');
-      res.write(JSON.stringify({ message: "hello world" }));
+      res.write(JSON.stringify(aulas));
       res.end();
     }
   }
